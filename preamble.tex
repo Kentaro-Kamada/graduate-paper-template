@@ -1,0 +1,61 @@
+
+% パッケージ
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{colortbl}
+\usepackage{pdflscape}
+\usepackage{tabu}
+\usepackage{threeparttable}
+\usepackage{threeparttablex}
+\usepackage[normalem]{ulem}
+\usepackage{makecell}
+\usepackage{xcolor}
+\usepackage{scalefnt} % 表の大きさいじる
+
+% フォント指定（MS明朝 + Times New Roman）
+\usepackage{luatexja-fontspec}
+\setmainfont{Times New Roman}
+\setmainjfont{MS Mincho}
+
+% レイアウト設定
+\usepackage{geometry}
+\geometry{top=3cm, bottom=3cm, left=3cm, right=3cm}
+
+% 文字数マクロ
+\makeatletter
+\def\mojiparline#1{
+    \newcounter{mpl}
+    \setcounter{mpl}{#1}
+    \@tempdima=\linewidth
+    \advance\@tempdima by-\value{mpl}\zw
+    \addtocounter{mpl}{-1}
+    \divide\@tempdima by \value{mpl}
+    \newskip\@tempkskip
+    \@tempkskip=\ltjgetparameter{kanjiskip}
+    \advance\@tempkskip by \@tempdima
+    \ltjsetparameter{kanjiskip=\@tempkskip}
+    \advance\parindent by\@tempdima
+    }
+\makeatother
+
+\def\linesparpage#1{
+    \baselineskip=\textheight
+    \divide\baselineskip by #1
+    }
+
+% 引用文献インデントマクロ定義
+\newenvironment{hangall}[1]{\hangindent = #1\zw\everypar{\hangindent = #1\zw}}{}
+
+
+% 脚注を文末注に変換
+\usepackage{endnotes}
+\let\footnote=\endnote
+\renewcommand{\theendnote}{\arabic{endnote}）} % 番号を「1）」の形式に
+\renewcommand{\notesname}{[注]} % デフォルトで入る'Note'の文字を'[注]'に変える
+\usepackage{etoolbox}
+\patchcmd{\enoteformat}{1.8em}{1\zw}{}{} % インデント設定
+\def\enotesize{\fontsize{10.5pt}{21.9pt}\selectfont} % フォント設定

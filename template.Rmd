@@ -1,0 +1,183 @@
+---
+output:
+  pdf_document:
+    includes:
+      in_header: "preamble.tex"
+    keep_tex: yes
+    toc: false
+    latex_engine: lualatex
+documentclass: ltjsarticle
+classoption: a4paper
+editor_options: 
+  chunk_output_type: console
+---
+
+
+```{r setup, include = FALSE, message=FALSE}
+# knitオプション
+# knit時のrootディレクトリを，.Rprojのあるディレクトリに設定（通常は.Rmdファイルのあるディレクトリ）
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+# チャンクオプション
+knitr::opts_chunk$set(message = F,
+                      warning = F, 
+                      echo = F,
+                      cache = T,
+                      cache.path = 'cache/',
+                      fig.path = 'files/',
+                      out.height = '20cm',
+                      out.width = '\\linewidth',
+                      fig.width = 7,
+                      fig.height = 5,
+                      dev = "cairo_pdf",
+                      dev.args = list(family = "ipaexg")
+                      )
+```
+
+
+```{r}
+library(knitr)
+library(rmarkdown)
+library(gt)
+library(tidyverse)
+```
+
+
+
+\input{表紙}
+
+\thispagestyle{empty}
+\setcounter{tocdepth}{2}
+\tableofcontents
+
+\clearpage
+
+\setcounter{page}{1}
+\fontsize{10.5pt}{21.9pt}\selectfont
+
+\mojiparline{40}
+
+# 1　問題設定
+
+　あらゆる分野の計量的研究において，コードの管理というのは，誰しもが頭を悩ます問題である。そこで，本稿ではRmarkdownから直接的にpdfを出力し，解析とレポーティングを同時に行うことで，この問題に対する解決法を提示する[^11]。  
+
+[^11]:注はこのような形で記入する。執筆規定にもよるが，今回の卒論は章末に注釈を置くことになっているのでこのような形式になっている（詳細は後述）。
+
+<!--章末注-->
+\theendnotes
+
+<!--章ごとに改ページ-->
+\clearpage
+
+# 2　先行研究の検討
+
+## 2.1　wordで卒論の問題点
+　なぜwordで卒論を書きたくないか。大きな理由は2点ある。  <!--段落変更は後ろに半角スペース2つ-->
+　第一に，レイアウトを考えるのが面倒だからである。wordで執筆する場合，excelでなどから図表をインポートする時に，どこに設置するかのようなことをいちいち考えなければならない[^21]。  
+　第二に，コピペ汚染の問題である。計量的研究では，SPSS，stataといった統計ソフトで解析した結果をexcelにコピペし，excel上で罫線を書く，桁数を調整するなどの整形作業を行い，そこからwordにコピペする，という作業が必要である。しかし，この方法では，解析をやり直すたびに，コピペ，図表の整形をやり直さなければならない。  
+　そんなもの，全ての分析が終わった後に図表を挿入すれば良いだけではないか，という声が聞こえてきそうである。しかし，分析が終わったと自分で思っても，予定変更が起こることは頻繁に起こる（一度書いたことがある人ならばわかるはず）。  
+　以上の理由から，wordでの執筆を少なくとも私はやりたくないと考えた。  
+
+## 2.2　先行事例
+　wordを避けて論文を書こうという試みは，社会科学系においてもいくつか存在する。本稿はこれらの先行事例を参考に，自分なりにブラッシュアップしたものを共有している。インスピレーションを与えてくれた先行事例の数々には，篤く感謝申し上げる。  
+　まず，Mugiyama（2017）では，Latexを用いて執筆する方法が紹介されている。Latexは数式に強く，理系の論文では良く使用されている。しかし，本稿の目的は解析とレポーティングの同時化であり，この方法では根本的な解決には至っていない。  
+　次に，Nigimitama（2019）では，本稿と同じくRmarkdownからpdfを出力する方法が紹介されている。本稿はこれをベースに，卒論執筆規定が求める調整を施している。
+
+[^21]:ただし，今回紹介する方法でも，図表の位置をまったく気にしなくてよくなるわけではない。
+
+\theendnotes
+
+\clearpage
+
+# 3　執筆方法
+
+## 3.1　本文
+　本文は普通に書けばよい。  
+　改段落は文末で半角スペース2つ。
+
+## 3.2　表
+　Latex対応は開発途上ではあるが，最近はgtを好んで使っている（複雑な表でなければ`kable`でも良い）。knitrではキャプションを`kable`関数の中に書くことで実装できるが，gtはまだ対応していないらしい。詳しくはGithubの[issue](https://github.com/rstudio/gt/issues/635)を参照。卒論ではlevel3の見出しを使ったが，あまりいい方法ではない。  
+　また，1ページに収めたいのに表がデカすぎる場合，\\scalefntというlatexのパッケージで大きさを変更できる。  
+
+\begingroup
+\scalefont{0.78}
+
+### 表1：irisの記述統計量
+```{r}
+iris %>% 
+  pivot_longer(cols = -Species, names_to = 'variables', values_to = 'value') %>% 
+  group_by(Species, variables) %>% 
+  summarise(n = n(),
+            mean = mean(value),
+            sd = sd(value),
+            min = min(value),
+            max = max(value)
+            ) %>% 
+  gt(groupname_col = 'Species') %>% 
+  fmt_number(columns = vars(mean, sd), 
+             decimals = 2)
+  
+```
+
+\endgroup
+
+## 3.3　図
+　図\ref{fig:fig01}がirisの散布図である。  
+　図の大きさは，`out.width``out.height``fig.width``fig.height`の4つのパラメータでいじることになる。最初の二つで描画領域を指定し，後の二つで図の比率をいじるイメージ。実際にいろいろやってみて感覚を掴んでほしい。
+
+```{r, fig.cap='irisの散布図 \\label{fig:fig01}'}
+iris %>% 
+  ggplot(aes(Petal.Length, Sepal.Length, color = Species))+
+  geom_point()+
+  theme_minimal()
+```
+
+
+## 3.4　引用
+　bibtexという便利なものがあるが，今回は利用していない。そもそもこれが便利なのはスタイルファイルなどが公式に提供されている場合であり，latexのlも知らない人が多い社会科学系では，強みを十分に生かすことができない。  
+
+## 3.5　注
+　既に登場しているが，注をつけたい場所に[^番号]と打ち，その後[^番号]:文章という形で注釈を書く[^31]。実際に出力される注番号は，ここで記入する番号とは異なり，latex側が勝手に順番・番号振りをやってくれる。注釈を書いたら，theendnotesというコマンドを，注釈を挿入したいところに書く。すると，コマンドまでの注釈がまとめて吐き出される。  
+　なお，デフォルトでは脚注になってしまうので，preambleで，定義を色々いじっている（hnsn1202 2013）。そちらも参照のこと。
+
+## 3.6　文献リスト
+　引用のところでも書いたが，Bibtexは使用していない。また，引用文献はぶら下げインデントをする慣習があるので，hangallという環境をpreambleで定義している（hakuoku 2018）。  
+
+## 3.7　レイアウト
+　geometryパッケージをpreambleに書き，余白を設定する。  
+　一行当たりの文字数は，\\mojiparlineというマクロをpreambleで定義している（ebal・北川 2020）。ページ当たりの行数は，\\linesparpageというマクロをpreambleで定義しているのでそれを使うか，wordで行数を設定した時の行送りの値を参考にするという手もある？  
+
+## 3.8　フォント
+　どのフォントを使うかは，preambleで指定する。luatexja-fontspecというパッケージを使い，\\setmainfontで英数字，\\setmainjfontで日本語のフォントを設定できる。なお，本稿はMS明朝 + Times New Romanで作成している。詳しくは公式vignette(http://mirrors.ibiblio.org/CTAN/macros/luatex/generic/luatexja/doc/luatexja-ja.pdf)を参照。
+　
+
+[^31]:例えばこんな感じ。
+
+
+\theendnotes
+
+\clearpage
+
+\pagenumbering{roman}
+\setcounter{page}{1}
+
+# 引用文献
+<!--latexコードを書いたつもりがエスケープされてしまった。みたいな場合は，以下のように書くと，強制的にlatexコードとして認識させることができる。参考：https://bookdown.org/yihui/rmarkdown-cookbook/raw-latex.html-->
+
+```{=latex}
+\begin{hangall}{2}  
+```
+
+ebal・北川弘典，2020，「LuaLaTex-jaの\\ltjgetparameterについて」（2021年1月10日取得 https://oku.edu.mie-u.ac.jp/tex/mod/forum/discuss.php?d=2907）．
+
+
+hakuoku，2018，「カスタム字下げ・地寄せ」（2021年1月10日取得 https://hakuoku.github.io/agakuTeX/tutorial/5_1flush/）．
+
+hnsn1202，2013，「LaTeXで脚注を文書末もしくは章末に書く手順」（2021年1月10日取得 http://hnsn1202.hateblo.jp/entry/2013/02/06/170617）．
+
+Mugiyama Ryota，2017，「修論LaTeXテンプレート（jsbook使用）」（2021年1月10日取得 http://ryotamugiyama.com/2017/02/17/textemplate/）．
+
+Nigimitama，2019，「［R］RMarkdownをPDFにして論文を書くときのテンプレート」（2021年1月10日取得 https://nigimitama.hatenablog.jp/entry/2019/01/13/021447）．
+
+```{=latex}
+\end{hangall}  
+```
