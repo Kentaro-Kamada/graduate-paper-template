@@ -147,7 +147,7 @@ iris %>%
 　一行当たりの文字数は，\\mojiparlineというマクロをpreambleで定義している（ebal・北川 2020）。ページ当たりの行数は，\\linesparpageというマクロをpreambleで定義しているのでそれを使うか，wordで行数を設定した時の行送りの値を参考にするという手もある？  
 
 ## 3.8　フォント
-　どのフォントを使うかは，preambleで指定する。luatexja-fontspecというパッケージを使い，\\setmainfontで英数字，\\setmainjfontで日本語のフォントを設定できる。なお，本稿はMS明朝 + Times New Romanで作成している。詳しくは公式vignette(http://mirrors.ibiblio.org/CTAN/macros/luatex/generic/luatexja/doc/luatexja-ja.pdf)を参照。
+　どのフォントを使うかは，preambleで指定する。luatexja-fontspecというパッケージを使い，\\setmainfontで英数字，\\setmainjfontで日本語のフォントを設定できる。なお，本稿はヒラギノ明朝 + Times New Romanで作成している。詳しくは公式vignette(http://mirrors.ibiblio.org/CTAN/macros/luatex/generic/luatexja/doc/luatexja-ja.pdf)を参照。
 　
 
 [^31]:例えばこんな感じ。

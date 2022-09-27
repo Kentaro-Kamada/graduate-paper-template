@@ -17,9 +17,18 @@
 \usepackage{scalefnt} % 表の大きさいじる
 
 % フォント指定（MS明朝 + Times New Roman）
-\usepackage{luatexja-fontspec}
-\setmainfont{Times New Roman}
-\setmainjfont{MS Mincho}
+\usepackage[hiragino-pro]{luatexja-preset}
+% \usepackage{luatexja-fontspec}
+\setmainfont{Times-New-Roman}
+% \setmainjfont[
+%     BoldFont           = MS-Gothic,
+%     BoldFeatures       = {FakeBold=2},
+%     ItalicFont         = MS-Mincho,
+%     ItalicFeatures     = {FakeSlant=0.33},
+%     BoldItalicFont     = MS-Gothic,
+%     BoldItalicFeatures = {FakeBold=2, FakeSlant=0.33}
+% ]{MS-Mincho}
+
 
 % レイアウト設定
 \usepackage{geometry}
@@ -50,12 +59,31 @@
 % 引用文献インデントマクロ定義
 \newenvironment{hangall}[1]{\hangindent = #1\zw\everypar{\hangindent = #1\zw}}{}
 
+% 章・節の定義変更
+% \renewcommand{\section}{\arabic{section}}
+% \renewcommand{\subsection}{\arabic{section}.\arabic{subsection}}
 
+
+%%%%%% 文末注の設定
 % 脚注を文末注に変換
 \usepackage{endnotes}
-\let\footnote=\endnote
-\renewcommand{\theendnote}{\arabic{endnote}）} % 番号を「1）」の形式に
-\renewcommand{\notesname}{[注]} % デフォルトで入る'Note'の文字を'[注]'に変える
 \usepackage{etoolbox}
-\patchcmd{\enoteformat}{1.8em}{1\zw}{}{} % インデント設定
-\def\enotesize{\fontsize{10.5pt}{21.9pt}\selectfont} % フォント設定
+\let\footnote=\endnote
+\renewcommand{\theendnote}{\arabic{endnote})} % 番号を「1)」の形式に
+\renewcommand{\notesname}{注} % デフォルトで入る'Note'の文字を'[注]'に変える
+
+% インデント設定
+\makeatletter % 「@」を命令中で使用する場合には\makeatletterと\makeatotherではさむ
+\renewcommand{\enoteformat}{
+  \rightskip\z@ % 右側インデント0文字
+  \leftskip=2\zw % 左側インデント全角2文字
+  \parindent=1\zw % 先頭インデント全角1文字
+  \leavevmode\llap{\hbox{$\theenmark　$}}} % 文末注の前の「1)」を上付きじゃなくする（上付きにするときは\theenmarkを^{\theenmark}とする）
+\makeatother
+
+\def\enotesize{\fontsize{10.5bp}{19.15bp}\selectfont} % フォント設定
+
+
+% stata出力の表中のマクロ
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+

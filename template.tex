@@ -4,10 +4,10 @@
 %
 \documentclass[
   a4paper]{ltjsarticle}
+\usepackage{amsmath,amssymb}
 \usepackage{lmodern}
-\usepackage{amssymb,amsmath}
-\usepackage{ifxetex,ifluatex}
-\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+\usepackage{iftex}
+\ifPDFTeX
   \usepackage[T1]{fontenc}
   \usepackage[utf8]{inputenc}
   \usepackage{textcomp} % provide euro and other symbols
@@ -33,13 +33,7 @@
   \KOMAoptions{parskip=half}}
 \makeatother
 \usepackage{xcolor}
-\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
-\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
-\hypersetup{
-  hidelinks,
-  pdfcreator={LaTeX via pandoc}}
-\urlstyle{same} % disable monospaced font for URLs
-\usepackage{graphicx,grffile}
+\usepackage{graphicx}
 \makeatletter
 \def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
 \def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
@@ -75,9 +69,18 @@
 \usepackage{scalefnt} % 表の大きさいじる
 
 % フォント指定（MS明朝 + Times New Roman）
-\usepackage{luatexja-fontspec}
-\setmainfont{Times New Roman}
-\setmainjfont{MS Mincho}
+\usepackage[hiragino-pro]{luatexja-preset}
+% \usepackage{luatexja-fontspec}
+\setmainfont{Times-New-Roman}
+% \setmainjfont[
+%     BoldFont           = MS-Gothic,
+%     BoldFeatures       = {FakeBold=2},
+%     ItalicFont         = MS-Mincho,
+%     ItalicFeatures     = {FakeSlant=0.33},
+%     BoldItalicFont     = MS-Gothic,
+%     BoldItalicFeatures = {FakeBold=2, FakeSlant=0.33}
+% ]{MS-Mincho}
+
 
 % レイアウト設定
 \usepackage{geometry}
@@ -108,19 +111,47 @@
 % 引用文献インデントマクロ定義
 \newenvironment{hangall}[1]{\hangindent = #1\zw\everypar{\hangindent = #1\zw}}{}
 
+% 章・節の定義変更
+% \renewcommand{\section}{\arabic{section}}
+% \renewcommand{\subsection}{\arabic{section}.\arabic{subsection}}
 
+
+%%%%%% 文末注の設定
 % 脚注を文末注に変換
 \usepackage{endnotes}
-\let\footnote=\endnote
-\renewcommand{\theendnote}{\arabic{endnote}）} % 番号を「1）」の形式に
-\renewcommand{\notesname}{[注]} % デフォルトで入る'Note'の文字を'[注]'に変える
 \usepackage{etoolbox}
-\patchcmd{\enoteformat}{1.8em}{1\zw}{}{} % インデント設定
-\def\enotesize{\fontsize{10.5pt}{21.9pt}\selectfont} % フォント設定
+\let\footnote=\endnote
+\renewcommand{\theendnote}{\arabic{endnote})} % 番号を「1)」の形式に
+\renewcommand{\notesname}{注} % デフォルトで入る'Note'の文字を'[注]'に変える
+
+% インデント設定
+\makeatletter % 「@」を命令中で使用する場合には\makeatletterと\makeatotherではさむ
+\renewcommand{\enoteformat}{
+  \rightskip\z@ % 右側インデント0文字
+  \leftskip=2\zw % 左側インデント全角2文字
+  \parindent=1\zw % 先頭インデント全角1文字
+  \leavevmode\llap{\hbox{$\theenmark　$}}} % 文末注の前の「1)」を上付きじゃなくする（上付きにするときは\theenmarkを^{\theenmark}とする）
+\makeatother
+
+\def\enotesize{\fontsize{10.5bp}{19.15bp}\selectfont} % フォント設定
+
+
+% stata出力の表中のマクロ
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+
 \usepackage{amsmath}
 \usepackage{booktabs}
 \usepackage{caption}
 \usepackage{longtable}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
 
 \author{}
 \date{\vspace{-2.5em}}
@@ -193,26 +224,25 @@
 \hypertarget{ux88681irisux306eux8a18ux8ff0ux7d71ux8a08ux91cf}{%
 \subsubsection{表1：irisの記述統計量}\label{ux88681irisux306eux8a18ux8ff0ux7d71ux8a08ux91cf}}
 
-\captionsetup[table]{labelformat=empty,skip=1pt}
-\begin{longtable}{lcrrrr}
+\begin{longtable}{lrrrrr}
 \toprule
 variables & n & mean & sd & min & max \\ 
 \midrule
-\multicolumn{1}{l}{setosa} \\ 
+\multicolumn{6}{l}{setosa} \\ 
 \midrule
 Petal.Length & 50 & $1.46$ & $0.17$ & 1.0 & 1.9 \\ 
 Petal.Width & 50 & $0.25$ & $0.11$ & 0.1 & 0.6 \\ 
 Sepal.Length & 50 & $5.01$ & $0.35$ & 4.3 & 5.8 \\ 
 Sepal.Width & 50 & $3.43$ & $0.38$ & 2.3 & 4.4 \\ 
 \midrule
-\multicolumn{1}{l}{versicolor} \\ 
+\multicolumn{6}{l}{versicolor} \\ 
 \midrule
 Petal.Length & 50 & $4.26$ & $0.47$ & 3.0 & 5.1 \\ 
 Petal.Width & 50 & $1.33$ & $0.20$ & 1.0 & 1.8 \\ 
 Sepal.Length & 50 & $5.94$ & $0.52$ & 4.9 & 7.0 \\ 
 Sepal.Width & 50 & $2.77$ & $0.31$ & 2.0 & 3.4 \\ 
 \midrule
-\multicolumn{1}{l}{virginica} \\ 
+\multicolumn{6}{l}{virginica} \\ 
 \midrule
 Petal.Length & 50 & $5.55$ & $0.55$ & 4.5 & 6.9 \\ 
 Petal.Width & 50 & $2.03$ & $0.27$ & 1.4 & 2.5 \\ 
@@ -261,7 +291,7 @@ Sepal.Width & 50 & $2.97$ & $0.32$ & 2.2 & 3.8 \\
 \hypertarget{ux30d5ux30a9ux30f3ux30c8}{%
 \subsection{3.8　フォント}\label{ux30d5ux30a9ux30f3ux30c8}}
 
-　どのフォントを使うかは，preambleで指定する。luatexja-fontspecというパッケージを使い，\textbackslash setmainfontで英数字，\textbackslash setmainjfontで日本語のフォントを設定できる。なお，本稿はMS明朝
+　どのフォントを使うかは，preambleで指定する。luatexja-fontspecというパッケージを使い，\textbackslash setmainfontで英数字，\textbackslash setmainjfontで日本語のフォントを設定できる。なお，本稿はヒラギノ明朝
 + Times New
 Romanで作成している。詳しくは公式vignette(\url{http://mirrors.ibiblio.org/CTAN/macros/luatex/generic/luatexja/doc/luatexja-ja.pdf)を参照}。
 　
@@ -294,6 +324,6 @@ Ryota，2017，「修論LaTeXテンプレート（jsbook使用）」（2021年1�
 Nigimitama，2019，「［R］RMarkdownをPDFにして論文を書くときのテンプレート」（2021年1月10日取得
 \url{https://nigimitama.hatenablog.jp/entry/2019/01/13/021447}）．
 
-\end{hangall}
+\end{hangall}  
 
 \end{document}
